@@ -1,0 +1,43 @@
+# Use Ubuntu as the base image
+FROM ubuntu:20.04
+
+# Set the maintainer label (Optional)
+LABEL maintainer="your_email@example.com"
+
+# Set the environment variable to not prompt during package installations
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Update the package list and install necessary packages
+RUN apt-get update && apt-get upgrade -y && apt-get install -y \
+    curl \
+    wget \
+    git \
+    vim \
+    build-essential \
+    python3 \
+    python3-pip \
+    nodejs \
+    npm \
+    openjdk-11-jdk \
+    unzip \
+    nano \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Python packages
+RUN pip3 install --upgrade pip \
+    && pip3 install flask requests numpy
+
+# Install Node.js packages globally
+RUN npm install -g express
+
+# Set up a working directory inside the container
+WORKDIR /app
+
+# Copy your application code (if any) into the working directory
+# COPY . /app
+
+# Expose any ports your application might use
+EXPOSE 8080
+
+# Set the command to run your application (adjust according to your needs)
+CMD ["bash"]
