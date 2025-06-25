@@ -1,0 +1,60 @@
+# 1. Start with Ubuntu 20.04 as the base image
+FROM ubuntu:20.04
+
+# 2. Set metadata for the image (optional but recommended)
+LABEL maintainer="your_email@example.com" \
+      version="1.0" \
+      description="A Dockerfile using all possible components with Ubuntu as the base image."
+
+# 3. Set build-time argument
+ARG APP_VERSION=1.0
+
+# 4. Set environment variables (example)
+ENV DEBIAN_FRONTEND=noninteractive \
+    APP_HOME=/app
+
+# 5. Install dependencies (update and upgrade the base image)
+RUN apt-get update && apt-get upgrade -y && apt-get install -y \
+    curl \
+    wget \
+    git \
+    build-essential \
+    python3 \
+    python3-pip \
+    nodejs \
+    npm \
+    vim \
+    && rm -rf /var/lib/apt/lists/*
+
+# 6. Create a working directory inside the container
+WORKDIR /app
+
+# 7. Copy files from the host to the container
+COPY ./app /app/
+
+# 8. Add a tar archive to the container and extract it
+ADD https://example.com/sample.tar.gz /app/sample
+
+# 9. Set a volume (for persisting data outside the container)
+VOLUME /app/data
+
+# 10. Expose a port (e.g., the app runs on port 8080)
+EXPOSE 8080
+
+# 11. Set the user to run the container (default is root)
+USER ubuntu
+
+# 12. Set the entrypoint to run a Python app (this cannot be overridden unless specified at runtime)
+ENTRYPOINT ["python3", "app.py"]
+
+# 13. Set the default command to run with the entrypoint (can be overridden)
+CMD ["flask", "run", "--host=0.0.0.0"]
+
+# 14. Define a health check to verify if the container is running
+HEALTHCHECK CMD curl --fail http://localhost:8080/health || exit 1
+
+# 15. Set the stop signal to gracefully stop the container
+STOPSIGNAL SIGTERM
+
+# 16. Add a shell configuration (optional)
+SHELL ["/bin/bash", "-c"]
